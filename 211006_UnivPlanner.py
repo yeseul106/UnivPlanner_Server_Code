@@ -153,17 +153,26 @@ def getLMSSubject(idx, connection):
         if check_exists_by_id("per_text"):
             innerTotalLectureLength = driver.find_elements_by_class_name("wb-inner-wrap ")
             driver.find_element_by_xpath("/ html / body / div[3] / div[2] / div / div[2] / div[2] / div[2] / "
-                                         "div / div[" + str(len(innerTotalLectureLength)) + "] / div").click()
+                                         "div / div[" + str(len(innerTotalLectureLength)) + "] / div").click()  # last inner lecture
             driver.implicitly_wait(0.1)
 
             if check_exists_by_xpath(
                     "/html/body/div[3]/div[2]/div/div[2]/div[2]/div[3]/div[1]/div[1]/div"):
                 print("try to go prev lecture")
 
+                prevLectureIdx = len(innerTotalLectureLength)
+
                 if len(innerTotalLectureLength) > 1:
-                    driver.find_element_by_xpath("/ html / body / div[3] / div[2] / div / div[2] / div[2] / div[2] / "
-                                                 "div / div[" + str(
-                        len(innerTotalLectureLength) - 1) + "] / div").click()
+                    while (prevLectureIdx > -1):  #  뒤부터 한 주차씩 돌면서 학습 기간인 강의 가져오기
+                        if (check_exists_by_xpath('/html/body/div[3]/div[2]/div/div[2]/div[2]/div[3]/div/div[1]/div') and
+                                driver.find_element_by_xpath('/html/body/div[3]/div[2]/div/div[2]/div[2]/div[3]/div/div[1]/div').text=="학습 기간이 아닙니다."):
+                            prevLectureIdx = prevLectureIdx-1
+                            driver.find_element_by_xpath(
+                                "/ html / body / div[3] / div[2] / div / div[2] / div[2] / div[2] / "
+                                "div / div[" + str(
+                                    prevLectureIdx) + "] / div").click()
+                        else:
+                            break
                     print("succ to go prev lecture")
 
                 else:
@@ -202,6 +211,7 @@ def getLMSSubject(idx, connection):
             print("no assignment tap")
             connection.sendall(bytes("AssignmentDone\n", 'utf-8'))
         #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''#
+
 
         if check_exists_by_xpath("//*[@id=\"report_list\"]/table/tbody/tr[1]/td[1]"):
             assignmentNum = driver.find_element_by_xpath("//*[@id=\"report_list\"]/table/tbody/tr[1]/td[1]").text
@@ -242,9 +252,8 @@ def getLMSSubject(idx, connection):
                     # print(assignmentPeriod)
             else:
                 connection.sendall(bytes("AssignmentDone\n", 'utf-8'))
-
         # else:
-        # print("no assignment")
+        #     print("no assignment tap")
 
         driver.get(mainLMSUrl)
         removePopUp()
@@ -337,4 +346,3 @@ if __name__ == "__main__":
             process.join()
 
     print(" All done")
-
