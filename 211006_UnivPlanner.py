@@ -195,7 +195,13 @@ def getLMSSubject(idx, connection):
             connection.sendall(bytes("0\n", 'utf-8'))
             # print("does not exist")
 
-        driver.get(driver.find_element_by_xpath("//*[@id=\"menu_report\"]").get_attribute("href"))
+        #'''''''''''''''''''''''''''no exist assignment tap'''''''''''''''''''''''''''''''''''#
+        try:
+            driver.get(driver.find_element_by_xpath("//*[@id=\"menu_report\"]").get_attribute("href"))
+        except:
+            print("no assignment tap")
+            connection.sendall(bytes("AssignmentDone\n", 'utf-8'))
+        #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''#
 
         if check_exists_by_xpath("//*[@id=\"report_list\"]/table/tbody/tr[1]/td[1]"):
             assignmentNum = driver.find_element_by_xpath("//*[@id=\"report_list\"]/table/tbody/tr[1]/td[1]").text
